@@ -37,11 +37,11 @@ h2{text-align:center;font-size:1.1em;color:#1d1d1f;margin-bottom:10px}
 .file-item{display:flex;align-items:center;padding:12px;border-bottom:1px solid #f0f0f0;gap:10px}
 .file-item:last-child{border-bottom:none}
 .file-icon{font-size:1.4em}
-.file-info{flex:1}
-.file-name{font-size:0.85em;font-weight:600;color:#333}
-.file-desc{font-size:0.72em;color:#888;margin-top:2px}
+.file-info{flex:1;min-width:0;overflow:hidden}
+.file-name{font-size:0.85em;font-weight:600;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-desc{font-size:0.72em;color:#888;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .file-note{font-size:0.72em;color:#e65100;margin-top:3px;font-weight:500}
-.file-action a{font-size:0.78em;background:#006341;color:#fff;padding:6px 12px;border-radius:6px;text-decoration:none;white-space:nowrap}
+.file-action a{font-size:0.78em;background:#006341;color:#fff;padding:6px 12px;border-radius:6px;text-decoration:none;white-space:nowrap;flex-shrink:0}
 .file-action a.pending{background:#999}
 .flight-info{margin:4px 12px 12px;background:#f9f9f9;border-radius:8px;padding:10px;border:1px solid #eee}
 .flight-info .label{font-size:0.75em;color:#666;margin-bottom:4px}
