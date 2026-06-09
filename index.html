@@ -153,10 +153,12 @@ h2{text-align:center;font-size:1.1em;color:#1d1d1f;margin-bottom:10px}
 </div>
 </div>
 
-<div class="footer">勾选后自动保存到本地 · 最后更新: <span id="last-save">-</span></div>
+<div class="footer">☁️ 云同步已开启（跨设备自动同步） · 最后更新: <span id="last-save">-</span></div>
 <div class="toast" id="toast"></div>
 
 <script>
+const BIN_ID='6a2778cfda38895dfe9d7d87';
+const API_KEY='$2a$10$ffWvBTST1KJtrupmUlXbjOaKJEUmSPK5RMUFHVAPG5ycNtcMyhDSe';
 const PEOPLE=[{key:'yanyan',name:'Yan Yan'},{key:'linhui',name:'Linhui'},{key:'yeqing',name:'Yeqing'}];
 const ITEMS=[
 {section:"申请表及证件照",items:[
@@ -193,6 +195,19 @@ const ITEMS=[
 
 let data={yanyan:{},linhui:{},yeqing:{}};
 
+async function cloudPull(){
+  try{
+    const r=await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{'X-Access-Key':API_KEY}});
+    if(r.ok){const j=await r.json();data=j.record||data;render();showToast('☁️ 已同步');}
+  }catch(e){console.log('pull failed',e);}
+}
+
+async function cloudPush(){
+  try{
+    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Access-Key':API_KEY},body:JSON.stringify(data)});
+  }catch(e){console.log('push failed',e);}
+}
+
 function render(){
   let html='';
   ITEMS.forEach(sec=>{
@@ -227,10 +242,9 @@ function updateProgress(){
 function load(){
   const saved=localStorage.getItem('italy-visa-tracker');
   if(saved) data=JSON.parse(saved);
-  const ts=localStorage.getItem('italy-visa-tracker-ts');
-  if(ts) document.getElementById('last-save').textContent=ts;
   render();
   loadFlight();
+  cloudPull();
 }
 
 function save(){
@@ -238,7 +252,8 @@ function save(){
   localStorage.setItem('italy-visa-tracker',JSON.stringify(data));
   localStorage.setItem('italy-visa-tracker-ts',ts);
   document.getElementById('last-save').textContent=ts;
-  showToast('✅ 已保存');
+  cloudPush();
+  showToast('✅ 已保存+同步');
 }
 
 function toggle(person,itemId,el){
@@ -275,6 +290,7 @@ function showToast(msg){
 }
 
 load();
+setInterval(cloudPull,30000);
 </script>
 </body>
 </html>
