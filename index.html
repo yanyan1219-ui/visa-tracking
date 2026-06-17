@@ -150,6 +150,17 @@ h2{text-align:center;font-size:1.1em;color:#1d1d1f;margin-bottom:10px}
 </div>
 </div>
 
+<div class="doc-section" id="notes">
+<div class="doc-section-title">📝 备注</div>
+<div style="padding:8px">
+<div id="notes-list"></div>
+<div style="display:flex;gap:6px;margin-top:8px">
+<input id="note-input" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:0.85em" placeholder="添加备注...">
+<button onclick="addNote()" style="padding:8px 14px;background:#006341;color:#fff;border:none;border-radius:6px;font-size:0.85em;font-weight:600;white-space:nowrap">添加</button>
+</div>
+</div>
+</div>
+
 <div class="footer">☁️ 云同步已开启（跨设备自动同步） · 最后更新: <span id="last-save">-</span></div>
 <div class="toast" id="toast"></div>
 
@@ -288,6 +299,31 @@ function showToast(msg){
 
 load();
 setInterval(cloudPull,30000);
+
+// Notes
+function loadNotes(){
+  const notes=JSON.parse(localStorage.getItem('visa-notes')||'[]');
+  const el=document.getElementById('notes-list');
+  el.innerHTML=notes.map((n,i)=>`<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #f0f0f0;gap:8px"><span style="flex:1;font-size:0.82em">${n.text}</span><span style="font-size:0.65em;color:#999;white-space:nowrap">${n.time}</span><button onclick="delNote(${i})" style="border:none;background:none;color:#c8102e;font-size:0.9em;cursor:pointer">×</button></div>`).join('');
+}
+function addNote(){
+  const input=document.getElementById('note-input');
+  const text=input.value.trim();
+  if(!text)return;
+  const notes=JSON.parse(localStorage.getItem('visa-notes')||'[]');
+  notes.unshift({text,time:new Date().toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'numeric',minute:'numeric'})});
+  localStorage.setItem('visa-notes',JSON.stringify(notes));
+  input.value='';
+  loadNotes();
+}
+function delNote(i){
+  const notes=JSON.parse(localStorage.getItem('visa-notes')||'[]');
+  notes.splice(i,1);
+  localStorage.setItem('visa-notes',JSON.stringify(notes));
+  loadNotes();
+}
+document.getElementById('note-input').addEventListener('keydown',e=>{if(e.key==='Enter')addNote();});
+loadNotes();
 </script>
 </body>
 </html>
