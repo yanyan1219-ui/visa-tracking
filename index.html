@@ -206,13 +206,14 @@ let data={yanyan:{},linhui:{},yeqing:{}};
 async function cloudPull(){
   try{
     const r=await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{'X-Access-Key':API_KEY}});
-    if(r.ok){const j=await r.json();data=j.record||data;render();showToast('☁️ 已同步');}
+    if(r.ok){const j=await r.json();const rec=j.record||{};data=rec.checklist||(rec.yanyan!==undefined?rec:data);if(rec.notes){localStorage.setItem('visa-notes',JSON.stringify(rec.notes));loadNotes();}render();showToast('☁️ 已同步');}
   }catch(e){console.log('pull failed',e);}
 }
 
 async function cloudPush(){
   try{
-    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Access-Key':API_KEY},body:JSON.stringify(data)});
+    const notes=JSON.parse(localStorage.getItem('visa-notes')||'[]');
+    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Access-Key':API_KEY},body:JSON.stringify({checklist:data,notes:notes})});
   }catch(e){console.log('push failed',e);}
 }
 
@@ -315,12 +316,14 @@ function addNote(){
   localStorage.setItem('visa-notes',JSON.stringify(notes));
   input.value='';
   loadNotes();
+  cloudPush();
 }
 function delNote(i){
   const notes=JSON.parse(localStorage.getItem('visa-notes')||'[]');
   notes.splice(i,1);
   localStorage.setItem('visa-notes',JSON.stringify(notes));
   loadNotes();
+  cloudPush();
 }
 document.getElementById('note-input').addEventListener('keydown',e=>{if(e.key==='Enter')addNote();});
 loadNotes();
